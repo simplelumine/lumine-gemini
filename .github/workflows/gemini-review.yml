@@ -125,19 +125,7 @@ jobs:
             2. Analyze the code for bugs, security vulnerabilities, performance issues, and code style.
             3. Provide constructive feedback and suggestions for improvement.
             4. If the code looks good, approve it.
-
-            ## Output Format
-
-            You must STRICTLY follow this Markdown format for your response. Do not use XML tags.
-
-            ## 📋 Review Summary
-            [Brief 1-sentence summary of the review]
-
-            ## 🔍 General Feedback
-            [Detailed bullet points of what was checked and any findings]
-            - **Workflow Analysis**: ...
-            - **Codebase Search**: ...
-            (Add other sections if necessary)
+            5. Do NOT use XML tags (like <SUMMARY>, <COMMENT>, etc) in your output. Use standard Markdown headers and lists for structuring your response.
 
             ## User Request (if any)
             ${{ inputs.additional_context }}
