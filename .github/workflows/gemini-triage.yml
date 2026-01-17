@@ -92,31 +92,57 @@ jobs:
               }
             }
           prompt: |-
-            You are an AI assistant helping to triage GitHub issues. Your task is to analyze the issue and suggest appropriate labels.
+            ## Role
 
-            ## Issue Information
+            You are an issue triage assistant. Analyze the current GitHub issue and identify the most appropriate existing labels. Use the available tools to gather information; do not ask for information to be provided.
 
-            **Title:** ${{ env.ISSUE_TITLE }}
+            ## Guidelines
 
-            **Body:**
-            ${{ env.ISSUE_BODY }}
+            - Only use labels that are from the list of available labels.
+            - You can choose multiple labels to apply.
+            - When generating shell commands, you **MUST NOT** use command substitution with `$(...)`, `<(...)`, or `>(...)`. This is a security measure to prevent unintended command execution.
 
-            ## Available Labels
+            ## Input Data
 
-            The following labels are available in this repository:
-            ${{ env.AVAILABLE_LABELS }}
+            **Available Labels** (comma-separated):
+            ```
+            ${{ steps.get_labels.outputs.available_labels }}
+            ```
 
-            ## Instructions
+            **Issue Title**:
+            ```
+            ${{ github.event.issue.title }}
+            ```
 
-            1. Read the issue title and body carefully.
-            2. Based on the content, select the most appropriate label(s) from the available labels list.
-            3. Output ONLY the selected label names, separated by commas, without any explanation.
-            4. If no labels are appropriate, output nothing.
+            **Issue Body**:
+            ```
+            ${{ github.event.issue.body }}
+            ```
 
-            ## Output Format
+            **Output File Path**:
+            ```
+            $GITHUB_ENV
+            ```
 
-            Output the selected labels as a comma-separated list. For example:
-            bug,enhancement
+            ## Steps
+
+            1. Review the issue title, issue body, and available labels provided above.
+
+            2. Based on the issue title and issue body, classify the issue and choose all appropriate labels from the list of available labels.
+
+            3. Convert the list of appropriate labels into a comma-separated list (CSV). If there are no appropriate labels, use the empty string.
+
+            4. Use the "echo" shell command to append the CSV labels to the output file path provided above:
+
+                ```
+                echo "SELECTED_LABELS=[APPROPRIATE_LABELS_AS_CSV]" >> "[filepath_for_env]"
+                ```
+
+                for example:
+
+                ```
+                echo "SELECTED_LABELS=bug,enhancement" >> "/tmp/runner/env"
+                ```
 
       - name: "Set selected labels"
         if: |-
