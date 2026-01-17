@@ -126,5 +126,18 @@ jobs:
             3. Provide constructive feedback and suggestions for improvement.
             4. If the code looks good, approve it.
 
+            ## Output Format
+
+            You must STRICTLY follow this Markdown format for your response. Do not use XML tags.
+
+            ## 📋 Review Summary
+            [Brief 1-sentence summary of the review]
+
+            ## 🔍 General Feedback
+            [Detailed bullet points of what was checked and any findings]
+            - **Workflow Analysis**: ...
+            - **Codebase Search**: ...
+            (Add other sections if necessary)
+
             ## User Request (if any)
             ${{ inputs.additional_context }}
