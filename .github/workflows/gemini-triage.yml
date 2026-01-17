@@ -59,9 +59,10 @@ jobs:
         id: "gemini_analysis"
         if: |-
           ${{ steps.get_labels.outputs.available_labels != '' }}
-        uses: "google-github-actions/run-gemini-cli@v0" # ratchet:exclude
+        uses: "google-github-actions/run-gemini-cli@main" # ratchet:exclude
         env:
           GOOGLE_GEMINI_BASE_URL: "${{ vars.GOOGLE_GEMINI_BASE_URL }}"
+          GEMINI_MODEL: "${{ vars.GEMINI_MODEL }}"
           GITHUB_TOKEN: "" # Do NOT pass any auth tokens here since this runs on untrusted inputs
           ISSUE_TITLE: "${{ github.event.issue.title }}"
           ISSUE_BODY: "${{ github.event.issue.body }}"
@@ -96,64 +97,7 @@ jobs:
                 ]
               }
             }
-          prompt: |-
-            ## Role
-
-            You are an issue triage assistant. Analyze the current GitHub issue and identify the most appropriate existing labels. Use the available tools to gather information; do not ask for information to be provided.
-
-            ## Guidelines
-
-            - Only use labels that are from the list of available labels.
-            - You can choose multiple labels to apply.
-            - When generating shell commands, you **MUST NOT** use command substitution with `$(...)`, `<(...)`, or `>(...)`. This is a security measure to prevent unintended command execution.
-
-            ## Input Data
-
-            **Available Labels** (comma-separated):
-            ```
-            ${{ steps.get_labels.outputs.available_labels }}
-            ```
-
-            **Issue Title**:
-            ```
-            ${{ github.event.issue.title }}
-            ```
-
-            **Issue Body**:
-            ```
-            ${{ github.event.issue.body }}
-            ```
-
-            **Output File Path**:
-            ```
-            $GITHUB_ENV
-            ```
-
-            ## Steps
-
-            1. Review the issue title, issue body, and available labels provided above.
-
-            2. Based on the issue title and issue body, classify the issue and choose all appropriate labels from the list of available labels.
-
-            3. Convert the list of appropriate labels into a comma-separated list (CSV). If there are no appropriate labels, use the empty string.
-
-            4. Use the "echo" shell command to append the CSV labels to the output file path provided above:
-
-                ```
-                echo "SELECTED_LABELS=[APPROPRIATE_LABELS_AS_CSV]" >> "[filepath_for_env]"
-                ```
-
-                for example:
-
-                ```
-                echo "SELECTED_LABELS=bug,enhancement" >> "/tmp/runner/env"
-                ```
-
-      - name: "Set selected labels"
-        if: |-
-          ${{ steps.gemini_analysis.outputs.summary != '' }}
-        run: |
-          echo "SELECTED_LABELS=${{ steps.gemini_analysis.outputs.summary }}" >> $GITHUB_ENV
+          prompt: "/gemini-triage"
 
   label:
     runs-on: "ubuntu-latest"
