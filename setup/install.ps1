@@ -26,8 +26,8 @@ if (-not (Test-Path $TargetWorkflowDir)) {
     New-Item -ItemType Directory -Force -Path $TargetWorkflowDir | Out-Null
 }
 
-$TemplateFile = Join-Path $TemplatesDir "gemini.yml"
-$TargetFile = Join-Path $TargetWorkflowDir "gemini.yml"
+$TemplateFile = Join-Path $TemplatesDir "lumine-gemini.yml"
+$TargetFile = Join-Path $TargetWorkflowDir "lumine-gemini.yml"
 
 if (Test-Path $TargetFile) {
     Write-Warning "Workflow file already exists at $TargetFile."

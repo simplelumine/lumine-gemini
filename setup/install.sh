@@ -31,8 +31,8 @@ echo -e "\033[0;36mInstalling Gemini Workflow...\033[0m"
 # 1. Install Workflow Template
 mkdir -p "$TARGET_WORKFLOW_DIR"
 
-TEMPLATE_FILE="${TEMPLATES_DIR}/gemini.yml"
-TARGET_FILE="${TARGET_WORKFLOW_DIR}/gemini.yml"
+TEMPLATE_FILE="${TEMPLATES_DIR}/lumine-gemini.yml"
+TARGET_FILE="${TARGET_WORKFLOW_DIR}/lumine-gemini.yml"
 
 if [ -f "$TARGET_FILE" ]; then
     echo "Warning: Workflow file already exists at $TARGET_FILE."
