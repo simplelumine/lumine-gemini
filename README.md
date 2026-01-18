@@ -1,47 +1,55 @@
 # Gemini Lumine Workflows
 
-This repository hosts reusable GitHub Actions workflows for Gemini-powered issue triage and management. It also provides a "distribution" setup to easily install these workflows into other repositories.
+**Gemini Lumine** automates code reviews, issue triage, and bug fixing. It functions as a "Workflow Distribution", allowing you to bootstrap AI capabilities into any repository with a single command.
+
+## Features
+
+- **🤖 Automated Triage**: Automatically categorizes and labels new issues.
+- **🧐 AI Code Review**: Reviews Pull Requests on open, synchronize (`push`), and reopen events.
+- **💬 ChatOps**: Interact with the bot using comments (e.g., `@gemini /fix`).
+- **📦 Zero-Config Distribution**: Install into any repo with a one-line setup script.
+
+## ChatOps Commands
+
+You can trigger Gemini manually by commenting on Issues or Pull Requests:
+
+| Command            | Description                                                  |
+| :----------------- | :----------------------------------------------------------- |
+| `@gemini /review`  | Trigger a full code review for the current PR.               |
+| `@gemini /fix`     | Ask Gemini to fix the issue or PR based on context.          |
+| `@gemini /triage`  | Re-run triage analysis on the current issue.                 |
+| `@gemini <prompt>` | Ask Gemini any question (e.g. `@gemini explain this logic`). |
 
 ## Installation
 
-You can install the Gemini workflows into any repository (e.g., `k8s-gitops`) using the provided setup scripts. This will:
+To install Gemini Workflows into a consumer repository (e.g., `k8s-gitops`):
 
-1.  Install the standard `.github/workflows/gemini.yml` caller workflow.
-2.  Configure necessary GitHub Variables (APP_ID, etc.).
-3.  Configure necessary GitHub Secrets (API Keys) from your local configuration.
+### 1. Prerequisites (One-time)
 
-### Prerequisites
+Ensure you have configured your secrets in **this** repository (`gemini-lumine`) at `setup/config/.env`:
 
-1.  **Configure Secrets (One-time):**
-    Ensure you have configured your secrets in this repository:
-    Edit `setup/config/.env` and add your keys:
-    ```env
-    APP_PRIVATE_KEY=...
-    GEMINI_API_KEY=...
-    ```
+```env
+APP_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----...
+GEMINI_API_KEY=...
+```
 
-### Run the Installer
+### 2. Run Installer
 
-Run the installer script **from the directory of the target repository** (the one you want to install gemini into).
+Open your terminal in the **target repository** and run the install script:
 
-#### Windows (PowerShell)
-
-Open your terminal in the target repo (e.g., `k8s-gitops`) and run:
+**Windows (PowerShell):**
 
 ```powershell
 ..\gemini-lumine\setup\install.ps1
 ```
 
-#### Linux / macOS
-
-Open your terminal in the target repo and run:
+**Linux / macOS:**
 
 ```bash
 ../gemini-lumine/setup/install.sh
 ```
 
-## Features
+This will automatically:
 
-- **Automatic Triage**: Automatically labels new issues based on their content.
-- **Scheduled Triage**: Periodically scans for untriaged issues.
-- **Dispatch Support**: Can be triggered manually or via other events.
+- Install `.github/workflows/gemini.yml`.
+- Set all required GitHub Variables and Secrets.
