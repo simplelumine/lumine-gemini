@@ -1,6 +1,6 @@
-# Gemini Lumine Workflows
+# Lumine Gemini Workflows
 
-**Gemini Lumine** automates code reviews, issue triage, and bug fixing. It functions as a "Workflow Distribution", allowing you to bootstrap AI capabilities into any repository with a single command.
+**Lumine Gemini** automates code reviews, issue triage, and bug fixing. It functions as a "Workflow Distribution", allowing you to bootstrap AI capabilities into any repository with a single command.
 
 ## Features
 
@@ -26,7 +26,7 @@ To install Gemini Workflows into a consumer repository (e.g., `k8s-gitops`):
 
 ### 1. Prerequisites (One-time)
 
-Ensure you have configured your secrets in **this** repository (`gemini-lumine`) at `setup/config/.env`:
+Ensure you have configured your secrets in **this** repository (`lumine-gemini`) at `setup/config/.env`:
 
 ```env
 APP_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----...
@@ -40,13 +40,13 @@ Open your terminal in the **target repository** and run the install script:
 **Windows (PowerShell):**
 
 ```powershell
-..\gemini-lumine\setup\install.ps1
+..\lumine-gemini\setup\install.ps1
 ```
 
 **Linux / macOS:**
 
 ```bash
-../gemini-lumine/setup/install.sh
+../lumine-gemini/setup/install.sh
 ```
 
 This will automatically:
