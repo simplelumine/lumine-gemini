@@ -45,6 +45,7 @@ jobs:
         uses: 'google-github-actions/run-gemini-cli@main' # ratchet:exclude
         id: 'gemini_pr_review'
         env:
+          GOOGLE_GEMINI_BASE_URL: '${{ vars.GOOGLE_GEMINI_BASE_URL }}'
           GITHUB_TOKEN: '${{ steps.mint_identity_token.outputs.token || secrets.GITHUB_TOKEN || github.token }}'
           ISSUE_TITLE: '${{ github.event.pull_request.title || github.event.issue.title }}'
           ISSUE_BODY: '${{ github.event.pull_request.body || github.event.issue.body }}'
