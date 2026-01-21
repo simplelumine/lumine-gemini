@@ -1,6 +1,7 @@
 name: "📋 Gemini Scheduled Issue Triage"
 
 on:
+  workflow_call:
   schedule:
     - cron: "0 * * * *" # Runs every hour
   pull_request:
