@@ -105,6 +105,31 @@ else
     echo "Warning: .env file not found at $ENV_FILE"
 fi
 
+# 3. Create Priority and Kind Labels
+# [ADDED] Create labels required for triage workflow
+echo -e "\n\033[0;36mCreating Priority and Kind Labels...\033[0m"
+
+declare -A LABELS=(
+    # Priority labels
+    ["priority/p0"]="#b60205:Critical/Blocker - Catastrophic failure demanding immediate attention"
+    ["priority/p1"]="#d93f0b:High - Serious issue significantly degrading UX or core feature"
+    ["priority/p2"]="#fbca04:Medium - Moderately impactful, noticeable but non-blocking"
+    ["priority/p3"]="#0e8a16:Low - Minor, trivial or cosmetic issue"
+    # Kind labels
+    ["kind/bug"]="#d73a4a:Something isn't working"
+    ["kind/enhancement"]="#a2eeef:New feature or request"
+    ["kind/question"]="#d876e3:Further information is requested"
+)
+
+for label in "${!LABELS[@]}"; do
+    IFS=':' read -r color description <<< "${LABELS[$label]}"
+    echo "Creating label: $label"
+    gh label create "$label" --color "${color#\#}" --description "$description" 2>/dev/null || \
+        gh label edit "$label" --color "${color#\#}" --description "$description" 2>/dev/null || \
+        echo "  Label '$label' already exists and couldn't be updated (skipped)"
+done
+
 echo -e "\n\033[0;32mSetup complete! Workflow installed and config applied.\033[0m"
 echo "gh variable list"
 echo "gh secret list"
+echo "gh label list"

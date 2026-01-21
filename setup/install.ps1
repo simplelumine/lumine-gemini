@@ -111,7 +111,37 @@ if (Test-Path $EnvFile) {
     Write-Warning ".env file not found at $EnvFile"
 }
 
+# 3. Create Priority and Kind Labels
+# [ADDED] Create labels required for triage workflow
+Write-Host "`nCreating Priority and Kind Labels..." -ForegroundColor Cyan
+
+$Labels = @{
+    # Priority labels
+    "priority/p0" = @{ Color = "b60205"; Description = "Critical/Blocker - Catastrophic failure demanding immediate attention" }
+    "priority/p1" = @{ Color = "d93f0b"; Description = "High - Serious issue significantly degrading UX or core feature" }
+    "priority/p2" = @{ Color = "fbca04"; Description = "Medium - Moderately impactful, noticeable but non-blocking" }
+    "priority/p3" = @{ Color = "0e8a16"; Description = "Low - Minor, trivial or cosmetic issue" }
+    # Kind labels
+    "kind/bug" = @{ Color = "d73a4a"; Description = "Something isn't working" }
+    "kind/enhancement" = @{ Color = "a2eeef"; Description = "New feature or request" }
+    "kind/question" = @{ Color = "d876e3"; Description = "Further information is requested" }
+}
+
+foreach ($label in $Labels.Keys) {
+    $color = $Labels[$label].Color
+    $description = $Labels[$label].Description
+    Write-Host "Creating label: $label"
+    $createResult = gh label create $label --color $color --description $description 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $editResult = gh label edit $label --color $color --description $description 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "  Label '$label' already exists and couldn't be updated (skipped)" -ForegroundColor Yellow
+        }
+    }
+}
+
 Write-Host "`nSetup complete! Workflow installed and config applied." -ForegroundColor Green
 Write-Host "You can verify settings with:"
 Write-Host "gh variable list"
 Write-Host "gh secret list"
+Write-Host "gh label list"

@@ -54,48 +54,40 @@ Parse the provided data above:
 
 ### Step 2: Analyze Label Semantics
 
-# [ADDED] Detailed Priority and Area Definitions
-# The following definitions for P0-P3 and Areas are derived from the project standards.
+# [ADDED] Detailed Priority and Kind Definitions
+# The following definitions for P0-P3 and Kind labels are derived from project standards.
 
 **Categorization Guidelines (Priority):**
 
-*   **P0: Critical / Blocker**
+*   **priority/p0: Critical / Blocker**
     *   **Description:** A catastrophic failure demanding immediate attention. Blocks users from using the product or prevents contribution.
     *   **Impact:** Major security vulnerability, data loss, crashes application, blocks development/testing.
     *   **Qualifier:** Is the main function of the software broken?
     *   **Example:** Auth login fails with unrecoverable error.
 
-*   **P1: High**
+*   **priority/p1: High**
     *   **Description:** Serious issue significantly degrading user experience or impacting core feature. Needs fast resolution.
     *   **Impact:** Core feature broken for many users/cases, severe performance degradation, no straightforward workaround.
     *   **Qualifier:** Is a key feature unusable or giving very wrong results?
     *   **Example:** Infinite loop in a core command.
 
-*   **P2: Medium**
+*   **priority/p2: Medium**
     *   **Description:** Moderately impactful issue, noticeable but doesn't prevent main functionality.
     *   **Impact:** Affects non-critical feature, inconvenient workaround exists, noticeable UI/UX problems.
     *   **Qualifier:** Is it an annoying but non-blocking problem?
     *   **Example:** Unclear error message or typo.
 
-*   **P3: Low**
+*   **priority/p3: Low**
     *   **Description:** Minor, low-impact issue, trivial or cosmetic.
     *   **Impact:** Minor cosmetic issues, edge-case bugs affecting tiny fraction of users.
     *   **Qualifier:** Is it a "nice-to-fix" issue?
     *   **Example:** Spelling mistakes.
 
-**Definition of Areas:**
+**Kind Labels:**
 
-*   **area/ux:** User-facing elements (usability, interactive features, docs, perceived performance).
-*   **area/platform:** Installation, packaging, OS compatibility (Windows, macOS, Linux).
-*   **area/background:** Long-running background tasks, daemons, agent features.
-*   **area/models:** Model responses, tool calling issues, model quality/inference, token consumption.
-*   **area/tools:** Model Context Protocol (MCP) support, new tool requests.
-*   **area/core:** Fundamental components (command parsing, config, session state, API client).
-*   **area/contribution:** Developer experience, CI/CD, build scripts, tests.
-*   **area/authentication:** Identity, login flows, API keys, credentials.
-*   **area/security-privacy:** Vulnerabilities, data sanitization, privacy controls.
-*   **area/extensibility:** Plugins, extension APIs, integrations.
-*   **area/performance:** Model performance, capacity limits (429), latency, CPU/memory usage.
+*   **kind/bug:** An error, flaw, or unexpected behavior in existing code. *Excludes feature requests.*
+*   **kind/enhancement:** A request for a new feature or improvement to existing functionality. *Excludes bug reports.*
+*   **kind/question:** Further information is requested.
 
 This semantic map will serve as your primary classification criteria.
 
