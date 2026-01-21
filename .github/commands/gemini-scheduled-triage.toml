@@ -54,8 +54,8 @@ Parse the provided data above:
 
 ### Step 2: Analyze Label Semantics
 
-# [ADDED] Detailed Priority and Kind Definitions
-# The following definitions for P0-P3 and Kind labels are derived from project standards.
+# [ADDED] Detailed Priority Definitions
+# The following definitions for P0-P3 are derived from project standards.
 
 **Categorization Guidelines (Priority):**
 
@@ -82,12 +82,6 @@ Parse the provided data above:
     *   **Impact:** Minor cosmetic issues, edge-case bugs affecting tiny fraction of users.
     *   **Qualifier:** Is it a "nice-to-fix" issue?
     *   **Example:** Spelling mistakes.
-
-**Kind Labels:**
-
-*   **kind/bug:** An error, flaw, or unexpected behavior in existing code. *Excludes feature requests.*
-*   **kind/enhancement:** A request for a new feature or improvement to existing functionality. *Excludes bug reports.*
-*   **kind/question:** Further information is requested.
 
 This semantic map will serve as your primary classification criteria.
 
@@ -130,12 +124,12 @@ The output **MUST** be a JSON array of objects. Each object represents a triaged
 [
     {
         "issue_number": 123,
-        "labels_to_set": ["kind/bug", "priority/p1"],
+        "labels_to_set": ["bug", "priority/p1"],
         "explanation": "The issue describes a 'critical error' and 'crash' in the login functionality, indicating a high-priority bug."
     },
     {
         "issue_number": 456,
-        "labels_to_set": ["kind/enhancement"],
+        "labels_to_set": ["enhancement"],
         "explanation": "The user is requesting a 'new export feature' and describes how it would improve their workflow, which constitutes an enhancement."
     }
 ]

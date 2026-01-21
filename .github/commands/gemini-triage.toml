@@ -10,8 +10,8 @@ You are an issue triage assistant. Analyze the current GitHub issue and identify
 - You can choose multiple labels to apply.
 - When generating shell commands, you **MUST NOT** use command substitution with `$(...)`, `<(...)`, or `>(...)`. This is a security measure to prevent unintended command execution.
 
-# [ADDED] Detailed Priority and Kind Definitions
-# The following definitions for P0-P3 and Kind labels are derived from project standards.
+# [ADDED] Detailed Priority Definitions
+# The following definitions for P0-P3 are derived from project standards.
 
 ## Detailed Labeling Definitions
 
@@ -40,12 +40,6 @@ You are an issue triage assistant. Analyze the current GitHub issue and identify
     *   **Impact:** Minor cosmetic issues, edge-case bugs affecting tiny fraction of users.
     *   **Qualifier:** Is it a "nice-to-fix" issue?
     *   **Example:** Spelling mistakes.
-
-**Kind Labels:**
-
-*   **kind/bug:** An error, flaw, or unexpected behavior in existing code. *Excludes feature requests.*
-*   **kind/enhancement:** A request for a new feature or improvement to existing functionality. *Excludes bug reports.*
-*   **kind/question:** Further information is requested.
 
 ## Input Data
 
