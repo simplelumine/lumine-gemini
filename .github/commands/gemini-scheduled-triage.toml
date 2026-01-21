@@ -111,7 +111,7 @@ Iterate through each issue object. For each issue:
 3.  Select the set of labels by evaluating the issue against two dimensions:
     - **Type (Kind):** What is the nature of the issue?
     - **Urgency (Priority):** How critical is it?
-    **You must select exactly one label from each dimension.**
+    **You MUST include exactly one `priority/*` label AND exactly one `kind/*` label.**
 4.  If no available labels are a clear and confident match, or if the issue quality is too low for analysis, **exclude that issue from the final output.**
 
 ### Step 5: Construct and Write Output
@@ -139,7 +139,7 @@ The output **MUST** be a JSON array of objects. Each object represents a triaged
     },
     {
         "issue_number": 456,
-        "labels_to_set": ["kind/enhancement"],
+        "labels_to_set": ["kind/enhancement", "priority/p2"],
         "explanation": "The user is requesting a 'new export feature' and describes how it would improve their workflow, which constitutes an enhancement."
     }
 ]
