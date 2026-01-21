@@ -1,143 +1,160 @@
-# Check if gh CLI is installed
+# Check Requirements
 if (-not (Get-Command "gh" -ErrorAction SilentlyContinue)) {
-    Write-Error "GitHub CLI (gh) is not installed. Please install it and run 'gh auth login' before running this script."
+    Write-Error "GitHub CLI (gh) not found."
     exit 1
 }
-
-# Check authentication
 if (-not (gh auth status 2>&1 | Select-String "Logged in to")) {
-    Write-Error "You are not logged in to GitHub CLI. Please run 'gh auth login'."
+    Write-Error "Not logged in to GitHub CLI."
     exit 1
 }
 
-# Determine paths
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$ScriptDir = Split-Path $MyInvocation.MyCommand.Path
 $ConfigDir = Join-Path $ScriptDir "config"
 $TemplatesDir = Join-Path $ScriptDir "templates"
 $SettingsFile = Join-Path $ConfigDir "settings.json"
 $EnvFile = Join-Path $ConfigDir ".env"
-$TargetWorkflowDir = Join-Path (Get-Location) ".github\workflows"
+$TargetWorkflowDir = ".github/workflows"
 
-Write-Host "Installing Gemini Workflow..." -ForegroundColor Cyan
+# --- Functions ---
 
-# 1. Install Workflow Template
-if (-not (Test-Path $TargetWorkflowDir)) {
-    Write-Host "Creating .github/workflows directory..."
-    New-Item -ItemType Directory -Force -Path $TargetWorkflowDir | Out-Null
-}
+function Install-Workflows {
+    Write-Host "`n[1] Installing Gemini Workflows & Prompts..." -ForegroundColor Cyan
+    if (-not (Test-Path $TargetWorkflowDir)) { New-Item -ItemType Directory -Force -Path $TargetWorkflowDir | Out-Null }
 
-$TemplateFile = Join-Path $TemplatesDir "lumine-gemini.yml"
-$TargetFile = Join-Path $TargetWorkflowDir "lumine-gemini.yml"
+    # Install YAML
+    $TemplateFile = Join-Path $TemplatesDir "lumine-gemini.yml"
+    $TargetFile = Join-Path $TargetWorkflowDir "lumine-gemini.yml"
 
-if (Test-Path $TargetFile) {
-    Write-Warning "Workflow file already exists at $TargetFile."
-    $response = Read-Host "Do you want to overwrite it? (y/N)"
-    if ($response -eq "y") {
-        Copy-Item -Path $TemplateFile -Destination $TargetFile -Force
-        Write-Host "Workflow updated." -ForegroundColor Green
+    if (Test-Path $TargetFile) {
+        $response = Read-Host "Workflow file exists. Overwrite? (y/N)"
+        if ($response -match "^[Yy]$") {
+            Copy-Item -Path $TemplateFile -Destination $TargetFile -Force
+            Write-Host "Workflow updated." -ForegroundColor Green
+        } else {
+            Write-Host "Skipped workflow file." -ForegroundColor Gray
+        }
     } else {
-        Write-Host "Skipping workflow installation."
+        Copy-Item -Path $TemplateFile -Destination $TargetFile -Force
+        Write-Host "Workflow installed." -ForegroundColor Green
     }
-} else {
-    Copy-Item -Path $TemplateFile -Destination $TargetFile
-    Write-Host "Workflow installed to $TargetFile." -ForegroundColor Green
+
+    # Install TOML Commands
+    $TargetCommandsDir = ".github/commands"
+    if (-not (Test-Path $TargetCommandsDir)) { New-Item -ItemType Directory -Force -Path $TargetCommandsDir | Out-Null }
+    Copy-Item -Path "$ScriptDir/../.github/commands/*" -Destination $TargetCommandsDir -Recurse -Force
+    Write-Host "Prompts installed to $TargetCommandsDir." -ForegroundColor Green
 }
 
-# 2. Inject Configuration
-Write-Host "`nSetting up GitHub Variables..." -ForegroundColor Cyan
-
-# Load Settings
-if (Test-Path $SettingsFile) {
-    try {
-        $settings = Get-Content $SettingsFile -Raw | ConvertFrom-Json
-        foreach ($prop in $settings.PSObject.Properties) {
-            $key = $prop.Name
-            $value = $prop.Value
-            Write-Host "Setting variable: $key"
-            gh variable set $key --body $value
+function Configure-Vars-Secrets {
+    Write-Host "`n[2] Configuring Variables & Secrets..." -ForegroundColor Cyan
+    
+    # Variables
+    if (Test-Path $SettingsFile) {
+        try {
+            $settings = Get-Content $SettingsFile -Raw | ConvertFrom-Json
+            foreach ($prop in $settings.PSObject.Properties) {
+                Write-Host "Setting variable: $($prop.Name)"
+                gh variable set $prop.Name --body $prop.Value
+            }
+        } catch {
+            Write-Error "Failed to parse $SettingsFile. Please ensure it is valid JSON."
         }
-    } catch {
-        Write-Error "Failed to parse $SettingsFile. Please ensure it is valid JSON."
-        exit 1
+    } else {
+        Write-Warning "$SettingsFile not found."
     }
-} else {
-    Write-Warning "Settings file not found at $SettingsFile"
-}
 
-Write-Host "`nSetting up GitHub Secrets..." -ForegroundColor Cyan
+    # Secrets
+    if (Test-Path $EnvFile) {
+        $envContent = Get-Content $EnvFile
+        $currentKey = $null; $currentValue = $null
 
-# Load Secrets from .env with Multi-line Support
-if (Test-Path $EnvFile) {
-    $envContent = Get-Content $EnvFile
-    $currentKey = $null
-    $currentValue = $null
-
-    function Set-Secret {
-        param($key, $val)
-        if (-not [string]::IsNullOrWhiteSpace($key) -and -not [string]::IsNullOrWhiteSpace($val)) {
-             # Remove surrounding quotes if present
-             if ($val.StartsWith('"') -and $val.EndsWith('"')) {
-                 $val = $val.Substring(1, $val.Length - 2)
-                 # Unescape \n
-                 $val = $val -replace '\\n', "`n"
-             }
-             Write-Host "Setting secret from .env: $key"
-             $val | gh secret set $key
-        } elseif (-not [string]::IsNullOrWhiteSpace($key)) {
-             Write-Warning "Secret '$key' is empty in .env. Skipping."
+        function Set-Secret {
+            param($k, $v)
+            if (-not [string]::IsNullOrWhiteSpace($k) -and -not [string]::IsNullOrWhiteSpace($v)) {
+                if ($v.StartsWith('"') -and $v.EndsWith('"')) { $v = $v.Substring(1, $v.Length - 2) }
+                $v = $v -replace '\\n', "`n"
+                Write-Host "Setting secret from .env: $k"
+                $v | gh secret set $k
+            } elseif (-not [string]::IsNullOrWhiteSpace($k)) {
+                Write-Warning "Secret '$k' is empty in .env. Skipping."
+            }
         }
-    }
 
-    foreach ($line in $envContent) {
-        # Check for new key definition (Start of line, Key=Value)
-        if ($line -match "^[A-Za-z_][A-Za-z0-9_]*=") {
-            # Flush previous
-            if ($currentKey) { Set-Secret $currentKey $currentValue }
-
-            $parts = $line.Split("=", 2)
-            $currentKey = $parts[0].Trim()
-            $currentValue = $parts[1].Trim() # Might be empty or start of value
-        } 
-        # Skip pure comments or empty lines if strict, but if parsing multi-line value, append
-        elseif ($null -ne $currentKey) {
-            # We are inside a value (likely multi-line key)
-            $currentValue += "`n" + $line
+        foreach ($line in $envContent) {
+            if ($line -match "^[A-Za-z_][A-Za-z0-9_]*=") {
+                Set-Secret $currentKey $currentValue
+                $parts = $line.Split("=", 2)
+                $currentKey = $parts[0].Trim()
+                $currentValue = $parts[1].Trim()
+            } elseif ($currentKey) {
+                $currentValue += "`n$line"
+            }
         }
+        Set-Secret $currentKey $currentValue
+    } else {
+        Write-Warning "$EnvFile not found."
     }
-    # Flush final
-    if ($currentKey) { Set-Secret $currentKey $currentValue }
-
-} else {
-    Write-Warning ".env file not found at $EnvFile"
 }
 
-# 3. Create Priority Labels
-# [ADDED] Create labels required for triage workflow
-Write-Host "`nCreating Priority Labels..." -ForegroundColor Cyan
+function Create-Labels {
+    Write-Host "`n[3] Creating Standard Labels..." -ForegroundColor Cyan
+    $Labels = @{
+        "priority/p0" = @{ Color = "b60205"; Description = "Critical/Blocker - Catastrophic failure demanding immediate attention" }
+        "priority/p1" = @{ Color = "d93f0b"; Description = "High - Serious issue significantly degrading UX or core feature" }
+        "priority/p2" = @{ Color = "fbca04"; Description = "Medium - Moderately impactful, noticeable but non-blocking" }
+        "priority/p3" = @{ Color = "0e8a16"; Description = "Low - Minor, trivial or cosmetic issue" }
+        "kind/bug"    = @{ Color = "d73a4a"; Description = "Something isn't working" }
+        "kind/enhancement" = @{ Color = "a2eeef"; Description = "New feature or request" }
+        "kind/question"    = @{ Color = "d876e3"; Description = "Further information is requested" }
+        "kind/documentation" = @{ Color = "0075ca"; Description = "Improvements or additions to documentation" }
+    }
 
-$Labels = @{
-    # Priority labels
-    "priority/p0" = @{ Color = "b60205"; Description = "Critical/Blocker - Catastrophic failure demanding immediate attention" }
-    "priority/p1" = @{ Color = "d93f0b"; Description = "High - Serious issue significantly degrading UX or core feature" }
-    "priority/p2" = @{ Color = "fbca04"; Description = "Medium - Moderately impactful, noticeable but non-blocking" }
-    "priority/p3" = @{ Color = "0e8a16"; Description = "Low - Minor, trivial or cosmetic issue" }
-}
-
-foreach ($label in $Labels.Keys) {
-    $color = $Labels[$label].Color
-    $description = $Labels[$label].Description
-    Write-Host "Creating label: $label"
-    $createResult = gh label create $label --color $color --description $description 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        $editResult = gh label edit $label --color $color --description $description 2>&1
+    foreach ($label in $Labels.Keys) {
+        $props = $Labels[$label]
+        Write-Host "Processing label: $label"
+        gh label create $label --color $props.Color --description $props.Description 2>$null
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "  Label '$label' already exists and couldn't be updated (skipped)" -ForegroundColor Yellow
+            gh label edit $label --color $props.Color --description $props.Description 2>$null
         }
     }
 }
 
-Write-Host "`nSetup complete! Workflow installed and config applied." -ForegroundColor Green
-Write-Host "You can verify settings with:"
-Write-Host "gh variable list"
-Write-Host "gh secret list"
+function Delete-Conflict-Labels {
+    Write-Host "`n[4] Deleting Conflicting Default Labels..." -ForegroundColor Cyan
+    $ConflictLabels = @("bug", "enhancement", "documentation", "question")
+    
+    foreach ($label in $ConflictLabels) {
+        Write-Host "Deleting label: $label"
+        gh label delete $label --yes 2>$null
+    }
+}
+
+# --- Main Menu ---
+
+while ($true) {
+    Write-Host "`nGemini Workflow Setup" -ForegroundColor Yellow
+    Write-Host "1. Install Workflows & Prompts"
+    Write-Host "2. Configure Variables & Secrets"
+    Write-Host "3. Create Standard Labels"
+    Write-Host "4. Delete Conflicting Default Labels"
+    Write-Host "5. Run All (Recommended for new repo)"
+    Write-Host "0. Exit"
+    
+    $choice = Read-Host "Select an option"
+    switch ($choice) {
+        "1" { Install-Workflows }
+        "2" { Configure-Vars-Secrets }
+        "3" { Create-Labels }
+        "4" { Delete-Conflict-Labels }
+        "5" { 
+            Install-Workflows
+            Configure-Vars-Secrets
+            Create-Labels
+            Delete-Conflict-Labels
+        }
+        "0" { exit }
+        default { Write-Host "Invalid option." -ForegroundColor Red }
+    }
+    Write-Host "`nDone." -ForegroundColor Green
+}
 Write-Host "gh label list"
