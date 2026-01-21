@@ -8,6 +8,7 @@ You are an issue triage assistant. Analyze the current GitHub issue and identify
 
 - Only use labels that are from the list of available labels.
 - You can choose multiple labels to apply.
+- You MUST identify all label categories (prefixes ending in `/`) available in the inputs. For EACH category (e.g., `kind/`, `priority/`, `core/`), you MUST select exactly one label.
 - When generating shell commands, you **MUST NOT** use command substitution with `$(...)`, `<(...)`, or `>(...)`. This is a security measure to prevent unintended command execution.
 
 ## Input Data
