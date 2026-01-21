@@ -61,6 +61,11 @@ jobs:
           repository: 'simplelumine/lumine-gemini'
           path: '.gemini-prompts'
 
+      - name: 'Register custom commands'
+        run: |
+          mkdir -p .gemini/commands
+          cp .gemini-prompts/prompts/*.toml .gemini/commands/
+
       - name: 'Run Gemini issue analysis'
         id: 'gemini_analysis'
         if: |-
@@ -102,7 +107,7 @@ jobs:
                 ]
               }
             }
-          prompt: './.gemini-prompts/prompts/gemini-triage.toml'
+          prompt: '/lumine-gemini-triage'
 
   label:
     runs-on: 'ubuntu-latest'
