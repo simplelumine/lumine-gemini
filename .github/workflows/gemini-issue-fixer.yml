@@ -92,4 +92,4 @@ jobs:
                 "outfile": ".gemini/telemetry.log"
               }
             }
-          prompt: '/gemini-issue-fixer'
+          prompt: './.github/prompts/gemini-issue-fixer.toml'

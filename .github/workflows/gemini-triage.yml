@@ -55,6 +55,9 @@ jobs:
             core.info(`Found ${labelNames.length} labels: ${labelNames.join(', ')}`);
             return labelNames;
 
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8' # ratchet:actions/checkout@v6
+
       - name: 'Run Gemini issue analysis'
         id: 'gemini_analysis'
         if: |-
@@ -96,7 +99,7 @@ jobs:
                 ]
               }
             }
-          prompt: '/gemini-triage'
+          prompt: './.github/prompts/gemini-triage.toml'
 
   label:
     runs-on: 'ubuntu-latest'

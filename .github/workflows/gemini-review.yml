@@ -108,4 +108,4 @@ jobs:
                 ]
               }
             }
-          prompt: '/gemini-review'
+          prompt: './.github/prompts/gemini-review.toml'
