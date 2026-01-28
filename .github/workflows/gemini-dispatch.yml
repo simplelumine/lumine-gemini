@@ -89,13 +89,16 @@ jobs:
           EVENT_TYPE: '${{ github.event_name }}.${{ github.event.action }}'
           REQUEST: '${{ github.event.comment.body || github.event.review.body || github.event.issue.body }}'
         with:
+          # DISABLED: We want to use the official gemini-code-assistant for reviews,
+          # so we disable this custom review trigger to avoid duplicate comments.
+          # core.setOutput('command', 'review'); 
           script: |
             const eventType = process.env.EVENT_TYPE;
             const request = process.env.REQUEST;
             core.setOutput('request', request);
 
             if (eventType === 'pull_request.opened') {
-              core.setOutput('command', 'review');
+              core.setOutput('command', 'ignore');
             } else if (['issues.opened', 'issues.reopened'].includes(eventType)) {
               core.setOutput('command', 'triage');
             } else if (request.startsWith("@gemini /review")) {
