@@ -99,12 +99,20 @@ function Create-Labels {
         "priority/p1" = @{ Color = "d93f0b"; Description = "High - Serious issue significantly degrading UX or core feature" }
         "priority/p2" = @{ Color = "fbca04"; Description = "Medium - Moderately impactful, noticeable but non-blocking" }
         "priority/p3" = @{ Color = "0e8a16"; Description = "Low - Minor, trivial or cosmetic issue" }
-        "kind/bug"    = @{ Color = "d73a4a"; Description = "Something isn't working" }
-        "kind/enhancement" = @{ Color = "a2eeef"; Description = "New feature or request" }
-        "kind/question"    = @{ Color = "d876e3"; Description = "Further information is requested" }
-        "kind/documentation" = @{ Color = "0075ca"; Description = "Improvements or additions to documentation" }
+
         "status/gemini-triaged" = @{ Color = "6f42c1"; Description = "Issue has been successfully analyzed and classified by Gemini" }
         "status/needs-triage" = @{ Color = "db2869"; Description = "Issue needs to be triaged by AI or maintainers" }
+
+        "kind/discussion" = @{ Color = "7057ff"; Description = "Discussion regarding architecture or design decisions" }
+        "kind/security"   = @{ Color = "FF4500"; Description = "Security vulnerability or critical safety issue" }
+        "kind/cleanup"    = @{ Color = "FFFFFF"; Description = "Code cleanup, dead code removal, and maintenance" }
+        "kind/bug"        = @{ Color = "FF0055"; Description = "Something isn't working" }
+        "kind/feature"    = @{ Color = "00E0FF"; Description = "New feature or request" }
+        "kind/perf"       = @{ Color = "CCFF00"; Description = "Code change that improves performance" }
+        "kind/refactor"   = @{ Color = "9D00FF"; Description = "Code change that neither fixes a bug nor adds a feature" }
+        "kind/test"       = @{ Color = "00FF9D"; Description = "Adding missing tests or correcting existing tests" }
+        "kind/docs"       = @{ Color = "F4D03F"; Description = "Improvements or additions to documentation" }
+        "kind/chore"      = @{ Color = "BFC9CA"; Description = "Build process, auxiliary tool changes, etc." }
     }
 
     foreach ($label in $Labels.Keys) {
@@ -119,7 +127,7 @@ function Create-Labels {
 
 function Delete-Conflict-Labels {
     Write-Host "`n[4] Deleting Conflicting Default Labels..." -ForegroundColor Cyan
-    $ConflictLabels = @("bug", "enhancement", "documentation", "question")
+    $ConflictLabels = @("bug", "enhancement", "documentation", "question", "duplicate", "wontfix", "invalid")
     
     foreach ($label in $ConflictLabels) {
         Write-Host "Deleting label: $label"

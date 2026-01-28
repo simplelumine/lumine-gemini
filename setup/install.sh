@@ -99,13 +99,21 @@ create_labels() {
         ["priority/p1"]="#d93f0b:High - Serious issue significantly degrading UX or core feature"
         ["priority/p2"]="#fbca04:Medium - Moderately impactful, noticeable but non-blocking"
         ["priority/p3"]="#0e8a16:Low - Minor, trivial or cosmetic issue"
-        # Kind
-        ["kind/bug"]="#d73a4a:Something isn't working"
-        ["kind/enhancement"]="#a2eeef:New feature or request"
-        ["kind/question"]="#d876e3:Further information is requested"
-        ["kind/documentation"]="#0075ca:Improvements or additions to documentation"
+
         ["status/gemini-triaged"]="#6f42c1:Issue has been successfully analyzed and classified by Gemini"
         ["status/needs-triage"]="#db2869:Issue needs to be triaged by AI or maintainers"
+
+        # Kind - User Defined
+        ["kind/discussion"]="#7057ff:Discussion regarding architecture or design decisions"
+        ["kind/security"]="#FF4500:Security vulnerability or critical safety issue"
+        ["kind/cleanup"]="#FFFFFF:Code cleanup, dead code removal, and maintenance"
+        ["kind/bug"]="#FF0055:Something isn't working"
+        ["kind/feature"]="#00E0FF:New feature or request"
+        ["kind/perf"]="#CCFF00:Code change that improves performance"
+        ["kind/refactor"]="#9D00FF:Code change that neither fixes a bug nor adds a feature"
+        ["kind/test"]="#00FF9D:Adding missing tests or correcting existing tests"
+        ["kind/docs"]="#F4D03F:Improvements or additions to documentation"
+        ["kind/chore"]="#BFC9CA:Build process, auxiliary tool changes, etc."
     )
 
     for label in "${!LABELS[@]}"; do
@@ -119,7 +127,7 @@ create_labels() {
 delete_conflict_labels() {
     echo -e "\n\033[0;36m[4] Deleting Conflicting Default Labels...\033[0m"
     # Only remove labels that conflict with our new kind/* schema
-    CONFLICT_LABELS=("bug" "enhancement" "documentation" "question")
+    CONFLICT_LABELS=("bug" "enhancement" "documentation" "question" "duplicate" "wontfix" "invalid")
     
     for label in "${CONFLICT_LABELS[@]}"; do
         echo "Deleting label: $label"
